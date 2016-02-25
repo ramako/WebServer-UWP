@@ -1,0 +1,1 @@
+MainPackage=C:\Users\pablo\documents\visual studio 2015\Projects\App4\App4\bin\x64\Debug\App4_1.0.0.0_x64_Debug.appx
