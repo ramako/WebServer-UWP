@@ -28,6 +28,7 @@ namespace App4
         //https://ms-iot.github.io/content/en-US/win10/samples/BlinkyWebServer.htm
         StreamSocketListener listener;
         IReadOnlyList<Windows.Networking.HostName> ipAdresses;
+        StorageFolder rootDirectory;
 
         public WebServer()
         {
@@ -38,6 +39,7 @@ namespace App4
         }
         public async Task startServer(string port)
         {
+            rootDirectory = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFolderAsync(@"www/");
             try {
                 
                 foreach(var item in ipAdresses)
@@ -66,56 +68,60 @@ namespace App4
                var t = Task.Run(
                     async () =>
                     {
-                                // estas 3 lineas en una funcion : var byteArray= loadHttpRequest()
+                             
                         var bytesAvailable = await reader.LoadAsync(1000);
                         var byteArray = new byte[bytesAvailable];
                         reader.ReadBytes(byteArray);
 
                         DataWriter writer = new DataWriter(args.Socket.OutputStream);
 
-                        var rootDirectory =  await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFolderAsync(@"www/");
                         string fileRequested = getPathToFile(byteArray);
                         Debug.WriteLine("File requested is " + fileRequested);
 
-                        if(fileRequested.Contains(".png"))
+
+                        Byte[] bSendData;
+                        var fileExtension = Path.GetExtension(fileRequested);
+                        if (fileExtension==".png" || fileExtension == ".jpg")
                         {
-                            //LEER FICHERO Y ENVIARLO
-                           var fileBinaryRequested= await rootDirectory.GetFileAsync(fileRequested);
-
-                           IBuffer binaryFileStream= await FileIO.ReadBufferAsync(fileBinaryRequested);
-                            Byte[] bytes = System.Runtime.InteropServices.WindowsRuntime.WindowsRuntimeBufferExtensions.ToArray(binaryFileStream);
-                            writer.WriteBytes(bytes);
-                            //fileBinaryRequested.
+                            bSendData =await getBinaryFile(fileRequested);
 
                         }
-                        //FIRST READ AND TRY TO SEND THE FILE...THEN FIGURE IT OUT HOW TO DESIGN IT PROPERLY
-                        else { 
-                            try {
-                                string response = await getFileFormattedHtml(rootDirectory,fileRequested);
-                                Debug.WriteLine("after getfileformattedhtml");
-                                Byte[] bSendData = Encoding.UTF8.GetBytes(response);
-                                writer.WriteBytes(bSendData);
-                            }
-                            catch (Exception e)
-                            {
-                            
-                               string response= await fileNotFound(rootDirectory);
-                                Byte[] bSendData = Encoding.UTF8.GetBytes(response);
-                                writer.WriteBytes(bSendData);
-                                Debug.WriteLine(e);
-                            }
+                        else
+                        {
+                            bSendData = await getHtmlFileAsBytes(fileRequested);
                         }
 
+                        writer.WriteBytes(bSendData);
                         await writer.StoreAsync();
                         await writer.FlushAsync();
     
                          args.Socket.Dispose();
                                 });
 
-            
-    
-
         }
+
+        private async Task<byte[]> getHtmlFileAsBytes(string fileRequested)
+        {
+            Byte[] bSendData;
+            try
+            {
+                string response = await getFileFormattedHtml(fileRequested);
+                Debug.WriteLine("after getfileformattedhtml");
+                bSendData = Encoding.UTF8.GetBytes(response);
+            }
+            catch (Exception e)
+            {
+
+                string response = await fileNotFound();
+                bSendData = Encoding.UTF8.GetBytes(response);
+
+                Debug.WriteLine(e);
+            }
+
+            return bSendData;
+            
+        }
+
 
         private string getPathToFile(Byte [] byteArray)
         {
@@ -127,7 +133,7 @@ namespace App4
         }
 
 
-        private async Task <string> getFileFormattedHtml(Windows.Storage.StorageFolder rootDirectory, string fileRequested)
+        private async Task <string> getFileFormattedHtml(string fileRequested)
         {
             Windows.Storage.StorageFile htmlPageRequested = await rootDirectory.GetFileAsync(fileRequested);
             var properties = await htmlPageRequested.GetBasicPropertiesAsync();
@@ -142,7 +148,17 @@ namespace App4
 
         }
 
-        private async Task<string>  fileNotFound(Windows.Storage.StorageFolder rootDirectory)
+        private async Task <byte[]> getBinaryFile(string fileRequested)
+        {
+            var fileBinaryRequested = await rootDirectory.GetFileAsync(fileRequested);
+
+            IBuffer binaryFileStream = await FileIO.ReadBufferAsync(fileBinaryRequested);
+            Byte[] bytes = System.Runtime.InteropServices.WindowsRuntime.WindowsRuntimeBufferExtensions.ToArray(binaryFileStream);
+            return bytes;
+        }
+        
+
+        private async Task<string>  fileNotFound()
         {
     
             Windows.Storage.StorageFile htmlErrorFile= await rootDirectory.GetFileAsync("404.html");
