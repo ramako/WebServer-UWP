@@ -29,7 +29,8 @@ namespace App4
         public MainPage()
         {
             this.InitializeComponent();
-            button_Click(new object(), new RoutedEventArgs());
+            //Iniciar automaticamente el servidor
+           // button_Click(new object(), new RoutedEventArgs());
         }
 
         private async void button_Click(object sender, RoutedEventArgs e)
@@ -41,8 +42,8 @@ namespace App4
 
         private async void button2_Click(object sender, RoutedEventArgs e)
         {
-            FolderPicker chooseFolder = new FolderPicker();
-            StorageFolder folder = await chooseFolder.PickSingleFolderAsync();
+            var loadBalancer = new LoadBalancer();
+            await loadBalancer.startLoadBalancer("80");
 
         }
     }

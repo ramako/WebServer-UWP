@@ -9,6 +9,6 @@
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Button x:Name="button" Content="Escuchar" HorizontalAlignment="Left" Margin="51,327,0,0" VerticalAlignment="Top" Click="button_Click"/>
-        <Button x:Name="button2" Content="Folder" Click="button2_Click"> </Button>
+        <Button x:Name="button2" Content="Load Balancer" HorizontalAlignment="Left" VerticalAlignment="Top" Click="button2_Click" Margin="51,359,0,0" />
     </Grid>
 </Page>
