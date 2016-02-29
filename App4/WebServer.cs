@@ -21,14 +21,12 @@ using Windows.UI.Xaml.Media.Imaging;
 namespace App4
 {
     //http://www.dzhang.com/blog/2012/09/18/a-simple-in-process-http-server-for-windows-8-metro-apps
-    class WebServer
+    class WebServer : Server
     {
         //https://msdn.microsoft.com/en-us/library/windows/apps/windows.networking.sockets.streamsocketlistener.aspx
         //https://code.msdn.microsoft.com/windowsapps/StreamSocket-Sample-8c573931/sourcecode?fileId=58542&pathId=2049390160
         //https://ms-iot.github.io/content/en-US/win10/samples/BlinkyWebServer.htm
-        StreamSocketListener listener;
         IReadOnlyList<Windows.Networking.HostName> ipAdresses;
-        StorageFolder rootDirectory;
 
         public WebServer()
         {
@@ -100,77 +98,7 @@ namespace App4
 
         }
 
-        private async Task<byte[]> getHtmlFileAsBytes(string fileRequested)
-        {
-            Byte[] bSendData;
-            try
-            {
-                string response = await getFileFormattedHtml(fileRequested);
-                Debug.WriteLine("after getfileformattedhtml");
-                bSendData = Encoding.UTF8.GetBytes(response);
-            }
-            catch (Exception e)
-            {
 
-                string response = await fileNotFound();
-                bSendData = Encoding.UTF8.GetBytes(response);
-
-                Debug.WriteLine(e);
-            }
-
-            return bSendData;
-            
-        }
-
-
-        private string getPathToFile(Byte [] byteArray)
-        {
-            const int positionOfPathRequested = 1;
-            string request = System.Text.Encoding.UTF8.GetString(byteArray);
-            string [] pathRequested = request.Split(' ');
-
-            return  pathRequested[positionOfPathRequested].TrimStart('/').Replace('/','\\');
-        }
-
-
-        private async Task <string> getFileFormattedHtml(string fileRequested)
-        {
-            Windows.Storage.StorageFile htmlPageRequested = await rootDirectory.GetFileAsync(fileRequested);
-            var properties = await htmlPageRequested.GetBasicPropertiesAsync();
-            string htmlPage = "HTTP/1.0 200 OK\r\n" +
-                 "Content-Lenght:" + properties.Size + "\r\n" +
-                 "Content-type: text/html\r\n" +
-                 "Connection: Close\r\n\r\n";
-            
-            htmlPage += await Windows.Storage.FileIO.ReadTextAsync(htmlPageRequested);
-
-            return htmlPage;
-
-        }
-
-        private async Task <byte[]> getBinaryFile(string fileRequested)
-        {
-            var fileBinaryRequested = await rootDirectory.GetFileAsync(fileRequested);
-
-            IBuffer binaryFileStream = await FileIO.ReadBufferAsync(fileBinaryRequested);
-            Byte[] bytes = System.Runtime.InteropServices.WindowsRuntime.WindowsRuntimeBufferExtensions.ToArray(binaryFileStream);
-            return bytes;
-        }
-        
-
-        private async Task<string>  fileNotFound()
-        {
-    
-            Windows.Storage.StorageFile htmlErrorFile= await rootDirectory.GetFileAsync("404.html");
-            var properties = await htmlErrorFile.GetBasicPropertiesAsync();
-            string htmlErrorPage = "HTTP/1.0 404 Not Found\r\n" +
-                 "Content-Lenght:" + properties.Size + "\r\n" +
-                 "Content-type: text/html\r\n" +
-                 "Connection: Close\r\n\r\n";
-            
-            htmlErrorPage+= await Windows.Storage.FileIO.ReadTextAsync(htmlErrorFile);
-            return htmlErrorPage;
-        }
 
     }//CLASS
 

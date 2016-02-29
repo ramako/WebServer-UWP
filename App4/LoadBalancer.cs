@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,9 +13,9 @@ using Windows.Web.Http;
 namespace App4
 {
     //https://msdn.microsoft.com/library/hh273122%28v=vs.100%29.aspx
-    public class LoadBalancer
+    public class LoadBalancer : Server
     {
-        StreamSocketListener listener;
+
         HttpClient cliente;
 
         public LoadBalancer()
@@ -45,21 +46,35 @@ namespace App4
             DataReader reader = new DataReader(args.Socket.InputStream);
             reader.InputStreamOptions = InputStreamOptions.Partial;
 
-            /*  var bytesAvailable = await reader.LoadAsync(1000);
+              var bytesAvailable = await reader.LoadAsync(1000);
               var byteArray = new byte[bytesAvailable];
               reader.ReadBytes(byteArray);
-              //extract URI?
-              System.Text.Encoding.UTF8.GetString(byteArray);*/
 
-            var respuesta=await cliente.GetAsync(new Uri("http://169.254.13.167/"));
+            string fileRequested = getPathToFile(byteArray);
+
+            var fileExtension = Path.GetExtension(fileRequested);
+            if (fileExtension == ".png" || fileExtension == ".jpg")
+            {
+                Debug.WriteLine("jpg requested");
+                var imagen=await cliente.GetAsync(new Uri("http://169.254.13.167/icons/ubuntu-logo.png"));
+                await imagen.Content.WriteToStreamAsync(args.Socket.OutputStream);
+            } 
+            else
+            { 
+
+                var respuesta=await cliente.GetAsync(new Uri("http://169.254.13.167/"));
+               await respuesta.Content.WriteToStreamAsync(args.Socket.OutputStream);
+                /*
             var respuestaString=await respuesta.Content.ReadAsStringAsync();
             Debug.WriteLine(respuestaString);
 
             DataWriter writer = new DataWriter(args.Socket.OutputStream);
             writer.WriteBytes(Encoding.UTF8.GetBytes(respuestaString));
             await writer.StoreAsync();
-            await writer.FlushAsync();
+            await writer.FlushAsync();*/
 
+            
+            }
             args.Socket.Dispose();
         }
     }
