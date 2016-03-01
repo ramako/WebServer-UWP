@@ -16,8 +16,6 @@ using Windows.UI.Xaml.Media.Imaging;
 
 
 //TODO Refactorizar para que quede ordenado mostrar imagenes y html
-//TODO Excepcion si el METODO HTTP no es GET
-//TODO Un balanceador de carga basico.
 namespace App4
 {
     //http://www.dzhang.com/blog/2012/09/18/a-simple-in-process-http-server-for-windows-8-metro-apps
@@ -70,6 +68,10 @@ namespace App4
                         var bytesAvailable = await reader.LoadAsync(1000);
                         var byteArray = new byte[bytesAvailable];
                         reader.ReadBytes(byteArray);
+                        if (getHttpMethod(byteArray) != "GET")
+                        {
+                            throw new Exception("Metodo HTTP no soportado");
+                        }
 
                         DataWriter writer = new DataWriter(args.Socket.OutputStream);
 

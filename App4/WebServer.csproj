@@ -108,6 +108,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="LoadBalancer.cs" />
+    <Compile Include="RoundRobinLoadBalancer.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="WebServer.cs" />
     <Compile Include="MainPage.xaml.cs">

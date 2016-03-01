@@ -42,7 +42,7 @@ namespace App4
 
         private async void button2_Click(object sender, RoutedEventArgs e)
         {
-            var loadBalancer = new LoadBalancer();
+            var loadBalancer = new RoundRobinLoadBalancer();
             await loadBalancer.startLoadBalancer("80");
 
         }

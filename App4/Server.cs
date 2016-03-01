@@ -51,6 +51,14 @@ namespace App4
             return pathRequested[positionOfPathRequested].TrimStart('/').Replace('/', '\\');
         }
 
+        protected string getHttpMethod(Byte[] byteArray)
+        {
+            const int positionOfMethod = 0;
+            string request = System.Text.Encoding.UTF8.GetString(byteArray);
+            string[] pathRequested = request.Split(' ');
+
+            return pathRequested[positionOfMethod];
+        }
 
         protected async Task<string> getFileFormattedHtml(string fileRequested)
         {
