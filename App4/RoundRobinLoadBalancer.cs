@@ -10,8 +10,9 @@ namespace App4
     class RoundRobinLoadBalancer : LoadBalancer
     {
         Queue<String> serverList;
+        
         string server1 = "http://169.254.13.167/";
-        string server2 = "http://192.168.1.20/";
+        string server2 = "http://192.168.1.27/";
 
         public RoundRobinLoadBalancer()
         {
@@ -25,7 +26,7 @@ namespace App4
         //PROBLEMA, EL JPG O PNG ES UN GET TAMBIEN Y SE LO PIDE AL "OTRO" SERVIDOR.
 public override string balanceRequests()
         {
-
+            
             serverList.Enqueue(serverList.Peek());
             return serverList.Dequeue();
         }

@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Networking;
 using Windows.Networking.Sockets;
 using Windows.Storage.Streams;
 using Windows.UI.Popups;
@@ -19,9 +20,11 @@ namespace App4
     {
 
         HttpClient cliente;
+      static  Dictionary<String, String> ipClientList;
 
         public LoadBalancer()
         {
+            ipClientList = new Dictionary<string, string>();
             listener = new StreamSocketListener();
             listener.ConnectionReceived += Listener_ConnectionReceived;
             cliente = new HttpClient();
@@ -40,18 +43,43 @@ namespace App4
                 await portErrorDialog.ShowAsync();
             }
         }
-
-        public 
-
+       
+        public static void getServersHealth()
+        {
+           // Debug.WriteLine("dubidubi du du dubidu!");
+         
+        }
 
 
         //TODO WinRT information: A connection with the server could not be established
         private async void Listener_ConnectionReceived(StreamSocketListener sender, StreamSocketListenerConnectionReceivedEventArgs args)
         {
+
+            foreach (var item in ipClientList)
+                Debug.WriteLine(item);
+            string value = "";
+      //      Debug.Write(ipClientList.TryGetValue(args.Socket.Information.RemoteAddress, out value));
             DataReader reader = new DataReader(args.Socket.InputStream);
             reader.InputStreamOptions = InputStreamOptions.Partial;
 
-              var bytesAvailable = await reader.LoadAsync(1000);
+           
+            string serverUri = ""; //servidor que le toca, hacer metodo getServer() que devuelva el serverUri necesario
+            if (ipClientList.TryGetValue(args.Socket.Information.RemoteAddress.ToString(), out  value)==true)
+            {
+                serverUri = value;
+       //         Debug.WriteLine("Ha encontrado mi ip");
+            } else
+            {
+                serverUri = balanceRequests();
+          //      Debug.Write(ipClientList.TryGetValue(args.Socket.Information.RemoteAddress, out value));
+                ipClientList.Add(args.Socket.Information.RemoteAddress.ToString(), serverUri);
+      
+                Debug.WriteLine("No ha encontrado mi IP");
+            }
+
+     //       Debug.WriteLine("server uri: " + serverUri);
+
+            var bytesAvailable = await reader.LoadAsync(1000);
               var byteArray = new byte[bytesAvailable];
               reader.ReadBytes(byteArray);
 
@@ -61,7 +89,7 @@ namespace App4
             }
             string fileRequested = getPathToFile(byteArray);
 
-            string serverUri = balanceRequests();
+           
 
             var uriRequest = new Uri(serverUri + fileRequested);
 
@@ -70,7 +98,6 @@ namespace App4
 
                 var respuesta=await cliente.GetAsync(uriRequest); // en try catch ?
                await respuesta.Content.WriteToStreamAsync(args.Socket.OutputStream);
-                balanceRequests();
             
             args.Socket.Dispose();
         }

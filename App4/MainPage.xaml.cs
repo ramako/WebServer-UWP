@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -26,11 +27,24 @@ namespace App4
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        bool isLoadBalancerClassActive = false;
+        //http://stackoverflow.com/questions/34271100/timer-in-uwp-app-which-isnt-linked-to-the-ui
         public MainPage()
         {
             this.InitializeComponent();
+            var checkServerStatusDispatcher = new DispatcherTimer();
+            checkServerStatusDispatcher.Tick += CheckServerStatusDispatcher_Tick;
+            checkServerStatusDispatcher.Interval = new TimeSpan(0, 0, 1);
+            checkServerStatusDispatcher.Start();
             //Iniciar automaticamente el servidor
            // button_Click(new object(), new RoutedEventArgs());
+        }
+
+        private void CheckServerStatusDispatcher_Tick(object sender, object e)
+        {
+            var tipe=Type.GetType("LoadBalancer");
+            if (isLoadBalancerClassActive == true)
+                LoadBalancer.getServersHealth();
         }
 
         private async void button_Click(object sender, RoutedEventArgs e)
@@ -44,6 +58,7 @@ namespace App4
         {
             var loadBalancer = new RoundRobinLoadBalancer();
             await loadBalancer.startLoadBalancer("80");
+            isLoadBalancerClassActive = true;
 
         }
     }
