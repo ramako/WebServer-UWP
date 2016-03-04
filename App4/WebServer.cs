@@ -83,6 +83,7 @@ namespace App4
                         var fileExtension = Path.GetExtension(fileRequested);
                         if (fileExtension==".png" || fileExtension == ".jpg")
                         {
+
                             bSendData =await getBinaryFile(fileRequested);
 
                         }

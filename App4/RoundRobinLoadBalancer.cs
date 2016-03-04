@@ -12,18 +12,16 @@ namespace App4
         Queue<String> serverList;
         
         string server1 = "http://169.254.13.167/";
-        string server2 = "http://192.168.1.27/";
+        string server2 = "http://192.168.1.28/";
 
         public RoundRobinLoadBalancer()
         {
             serverList = new Queue<string>();
             serverList.Enqueue(server1);
             serverList.Enqueue(server2);
-            Debug.WriteLine(serverList.Count);
 
         }
 
-        //PROBLEMA, EL JPG O PNG ES UN GET TAMBIEN Y SE LO PIDE AL "OTRO" SERVIDOR.
 public override string balanceRequests()
         {
             

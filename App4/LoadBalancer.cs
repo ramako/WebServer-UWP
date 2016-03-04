@@ -19,6 +19,7 @@ namespace App4
     public abstract class LoadBalancer : Server
     {
 
+        Cache cacheServer;
         HttpClient cliente;
       static  Dictionary<String, String> ipClientList;
 
@@ -28,6 +29,7 @@ namespace App4
             listener = new StreamSocketListener();
             listener.ConnectionReceived += Listener_ConnectionReceived;
             cliente = new HttpClient();
+            cacheServer = new Cache();
         }
 
         //dhcpcd eth0 to make it work ubuntu server
@@ -44,10 +46,62 @@ namespace App4
             }
         }
        
-        public static void getServersHealth()
+        //PING
+        public async static void getServersHealth()
         {
-           // Debug.WriteLine("dubidubi du du dubidu!");
-         
+            string ConnectionAttemptInformation = "";
+            HostName server2 = new HostName("192.168.1.30");
+            try
+            {
+                using (var tcpClient = new StreamSocket())
+                {
+                    await tcpClient.ConnectAsync(
+                        server2,
+                        "80",
+                        SocketProtectionLevel.PlainSocket);
+
+                    var localIp = tcpClient.Information.LocalAddress.DisplayName;
+                    var remoteIp = tcpClient.Information.RemoteAddress.DisplayName;
+
+                    ConnectionAttemptInformation = String.Format("Success, remote server contacted at IP address {0}",
+                                                                 remoteIp);
+                    tcpClient.Dispose();
+                }
+            }
+            catch (Exception ex)
+            {
+                if (ex.HResult == -2147014836)
+                {
+                    ConnectionAttemptInformation = "Error: Timeout when connecting (check hostname and port)";
+                }
+                else
+                {
+                    ConnectionAttemptInformation = "Error: Exception returned from network stack: " + ex.Message;
+                }
+            }
+
+            Debug.WriteLine(ConnectionAttemptInformation);
+
+        }
+
+        public string dealServer(StreamSocketListenerConnectionReceivedEventArgs args)
+        {
+            string serverUri = "";
+            string value = "";
+            if (ipClientList.TryGetValue(args.Socket.Information.RemoteAddress.ToString(), out value) == true)
+            {
+                serverUri = value;
+     //           Debug.WriteLine("IP found in hash table.");
+            }
+            else
+            {
+                serverUri = balanceRequests();
+                ipClientList.Add(args.Socket.Information.RemoteAddress.ToString(), serverUri);
+
+       //         Debug.WriteLine("IP not found in hash table.");
+            }
+
+            return serverUri;
         }
 
 
@@ -57,28 +111,12 @@ namespace App4
 
             foreach (var item in ipClientList)
                 Debug.WriteLine(item);
-            string value = "";
-      //      Debug.Write(ipClientList.TryGetValue(args.Socket.Information.RemoteAddress, out value));
+
             DataReader reader = new DataReader(args.Socket.InputStream);
             reader.InputStreamOptions = InputStreamOptions.Partial;
 
-           
-            string serverUri = ""; //servidor que le toca, hacer metodo getServer() que devuelva el serverUri necesario
-            if (ipClientList.TryGetValue(args.Socket.Information.RemoteAddress.ToString(), out  value)==true)
-            {
-                serverUri = value;
-       //         Debug.WriteLine("Ha encontrado mi ip");
-            } else
-            {
-                serverUri = balanceRequests();
-          //      Debug.Write(ipClientList.TryGetValue(args.Socket.Information.RemoteAddress, out value));
-                ipClientList.Add(args.Socket.Information.RemoteAddress.ToString(), serverUri);
-      
-                Debug.WriteLine("No ha encontrado mi IP");
-            }
-
-     //       Debug.WriteLine("server uri: " + serverUri);
-
+            string serverUri = dealServer(args);
+          
             var bytesAvailable = await reader.LoadAsync(1000);
               var byteArray = new byte[bytesAvailable];
               reader.ReadBytes(byteArray);
@@ -89,15 +127,26 @@ namespace App4
             }
             string fileRequested = getPathToFile(byteArray);
 
-           
+            //if(cache.getImage()==false) y guardar la imagen .
 
             var uriRequest = new Uri(serverUri + fileRequested);
 
 
             var fileExtension = Path.GetExtension(fileRequested);
+            if(fileExtension ==".png" | fileExtension == ".jpg")
+            {
+                cacheServer.getImage(uriRequest);
+            }
 
-                var respuesta=await cliente.GetAsync(uriRequest); // en try catch ?
-               await respuesta.Content.WriteToStreamAsync(args.Socket.OutputStream);
+            try {
+                var respuesta = await cliente.GetAsync(uriRequest); 
+                await respuesta.Content.WriteToStreamAsync(args.Socket.OutputStream);
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+            }
+               
             
             args.Socket.Dispose();
         }
