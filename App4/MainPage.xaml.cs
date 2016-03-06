@@ -34,7 +34,7 @@ namespace App4
             this.InitializeComponent();
             var checkServerStatusDispatcher = new DispatcherTimer();
             checkServerStatusDispatcher.Tick += CheckServerStatusDispatcher_Tick;
-            checkServerStatusDispatcher.Interval = new TimeSpan(0, 0, 1);
+            checkServerStatusDispatcher.Interval = new TimeSpan(0, 1, 0);
             checkServerStatusDispatcher.Start();
             //Iniciar automaticamente el servidor
            // button_Click(new object(), new RoutedEventArgs());

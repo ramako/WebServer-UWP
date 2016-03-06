@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage;
+using Windows.Storage.Streams;
+using Windows.UI.Xaml.Media.Imaging;
 using Windows.Web.Http;
 
 namespace App4
@@ -25,25 +27,47 @@ namespace App4
             Debug.WriteLine("el directorio es " + cache.Path);
         }
 
-        public async void getImage(Uri imageRequested)
+        public async Task<byte[]> getImage(Uri imageRequested)
         {
-            Debug.WriteLine("imagen: "+ imageRequested);
+            byte[] byteStream = new byte[1024];
+            Windows.Storage.Streams.Buffer nuevoBuffer = new Windows.Storage.Streams.Buffer(1024);
+            string fileNameRequested=imageRequested.Segments.Last(); // ultimo segmento ubuntu-logo.png
+
+            Debug.WriteLine("imagen: "+ fileNameRequested);
             try {
-                await cache.GetFileAsync("ubuntu-logo.png");
+                var image = await cache.GetFileAsync(fileNameRequested);
+                IBuffer binaryFileStream = await FileIO.ReadBufferAsync(image);
+                Debug.WriteLine("despues de readbuffer");
+                Byte[] bytes = System.Runtime.InteropServices.WindowsRuntime.WindowsRuntimeBufferExtensions.ToArray(binaryFileStream);
+                return bytes;
             }catch (Exception e)
             {
-                downloadImage(imageRequested);
-                Debug.Write(e);
+                Debug.WriteLine("excepcionr");
+                await downloadImage(imageRequested,fileNameRequested);
+
+                var image = await cache.GetFileAsync(fileNameRequested);
+                IBuffer binaryFileStream = await FileIO.ReadBufferAsync(image);
+                Debug.WriteLine("despues de readbuffer");
+                Byte[] bytes = System.Runtime.InteropServices.WindowsRuntime.WindowsRuntimeBufferExtensions.ToArray(binaryFileStream);
+                return bytes;
+
             }
         }
 
-        public async void downloadImage(Uri imageRequested)
+        public async Task downloadImage(Uri imageRequested, string fileNameRequested)
         {
-            StorageFile myfile = await cache.CreateFileAsync("ubuntu.jpg", CreationCollisionOption.ReplaceExisting);
+            try { 
+            StorageFile myfile = await cache.CreateFileAsync(fileNameRequested, CreationCollisionOption.ReplaceExisting);
             var response = await cliente.GetAsync(imageRequested);
-         //   var image=await response.Content.ReadAsInputStreamAsync();
+
             var stream=await myfile.OpenAsync(FileAccessMode.ReadWrite);
             await response.Content.WriteToStreamAsync(stream);
+                response.Dispose();
+                stream.Dispose();
+            } catch (Exception e)
+            {
+                Debug.WriteLine("damn");
+            }
 
         }
 

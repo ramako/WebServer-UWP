@@ -127,27 +127,36 @@ namespace App4
             }
             string fileRequested = getPathToFile(byteArray);
 
-            //if(cache.getImage()==false) y guardar la imagen .
-
             var uriRequest = new Uri(serverUri + fileRequested);
 
 
             var fileExtension = Path.GetExtension(fileRequested);
             if(fileExtension ==".png" | fileExtension == ".jpg")
             {
-                cacheServer.getImage(uriRequest);
-            }
+               var test= await cacheServer.getImage(uriRequest);
+                DataWriter writer = new DataWriter(args.Socket.OutputStream);
+                writer.WriteBytes(test);
+                await writer.StoreAsync();
+         //       await args.Socket.OutputStream.WriteAsync(test);
+           //     await args.Socket.OutputStream.FlushAsync();
+                Debug.WriteLine("entra jpg");
+
+            } else { 
 
             try {
-                var respuesta = await cliente.GetAsync(uriRequest); 
+                    Debug.WriteLine(uriRequest);
+                var respuesta = await cliente.GetAsync(uriRequest);
+                  //  Debug.WriteLine(respuesta.Content.ToString());
                 await respuesta.Content.WriteToStreamAsync(args.Socket.OutputStream);
-            }
+                   
+                }
             catch (Exception e)
             {
                 Debug.WriteLine(e);
             }
-               
-            
+            }
+            //               args.Socket.OutputStream.WriteAsync()
+          
             args.Socket.Dispose();
         }
 
