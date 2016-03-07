@@ -45,8 +45,8 @@ namespace App4
                 await portErrorDialog.ShowAsync();
             }
         }
-       
-        //PING
+
+        //https://github.com/christophwille/winrt-vasily/blob/facd1741a7ca278ecd99e7ce9336adea408b4917/Source/Vasily/ViewModels/MainPageViewModel.cs
         public async static void getServersHealth()
         {
             string ConnectionAttemptInformation = "";
@@ -137,16 +137,12 @@ namespace App4
                 DataWriter writer = new DataWriter(args.Socket.OutputStream);
                 writer.WriteBytes(test);
                 await writer.StoreAsync();
-         //       await args.Socket.OutputStream.WriteAsync(test);
-           //     await args.Socket.OutputStream.FlushAsync();
-                Debug.WriteLine("entra jpg");
+                writer.Dispose();
 
             } else { 
 
             try {
-                    Debug.WriteLine(uriRequest);
                 var respuesta = await cliente.GetAsync(uriRequest);
-                  //  Debug.WriteLine(respuesta.Content.ToString());
                 await respuesta.Content.WriteToStreamAsync(args.Socket.OutputStream);
                    
                 }

@@ -29,29 +29,24 @@ namespace App4
 
         public async Task<byte[]> getImage(Uri imageRequested)
         {
-            byte[] byteStream = new byte[1024];
-            Windows.Storage.Streams.Buffer nuevoBuffer = new Windows.Storage.Streams.Buffer(1024);
+            Byte[] bytes;
             string fileNameRequested=imageRequested.Segments.Last(); // ultimo segmento ubuntu-logo.png
+            StorageFile image;
 
             Debug.WriteLine("imagen: "+ fileNameRequested);
             try {
-                var image = await cache.GetFileAsync(fileNameRequested);
-                IBuffer binaryFileStream = await FileIO.ReadBufferAsync(image);
-                Debug.WriteLine("despues de readbuffer");
-                Byte[] bytes = System.Runtime.InteropServices.WindowsRuntime.WindowsRuntimeBufferExtensions.ToArray(binaryFileStream);
-                return bytes;
+                 image = await cache.GetFileAsync(fileNameRequested);
+
             }catch (Exception e)
             {
                 Debug.WriteLine("excepcionr");
                 await downloadImage(imageRequested,fileNameRequested);
-
-                var image = await cache.GetFileAsync(fileNameRequested);
-                IBuffer binaryFileStream = await FileIO.ReadBufferAsync(image);
-                Debug.WriteLine("despues de readbuffer");
-                Byte[] bytes = System.Runtime.InteropServices.WindowsRuntime.WindowsRuntimeBufferExtensions.ToArray(binaryFileStream);
-                return bytes;
-
+                 image = await cache.GetFileAsync(fileNameRequested);
             }
+
+            IBuffer binaryFileStream = await FileIO.ReadBufferAsync(image);
+            bytes = System.Runtime.InteropServices.WindowsRuntime.WindowsRuntimeBufferExtensions.ToArray(binaryFileStream);
+            return bytes;
         }
 
         public async Task downloadImage(Uri imageRequested, string fileNameRequested)
@@ -59,14 +54,13 @@ namespace App4
             try { 
             StorageFile myfile = await cache.CreateFileAsync(fileNameRequested, CreationCollisionOption.ReplaceExisting);
             var response = await cliente.GetAsync(imageRequested);
-
             var stream=await myfile.OpenAsync(FileAccessMode.ReadWrite);
             await response.Content.WriteToStreamAsync(stream);
-                response.Dispose();
-                stream.Dispose();
+            response.Dispose();
+            stream.Dispose();
             } catch (Exception e)
             {
-                Debug.WriteLine("damn");
+                Debug.WriteLine("Error");
             }
 
         }

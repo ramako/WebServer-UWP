@@ -56,6 +56,9 @@ namespace App4
 
         private async void button2_Click(object sender, RoutedEventArgs e)
         {
+           var test= new MyUserControl1();
+            test.Visibility = Visibility.Visible;
+            mainGrid.Children.Add(test);
             var loadBalancer = new RoundRobinLoadBalancer();
             await loadBalancer.startLoadBalancer("80");
             isLoadBalancerClassActive = true;
