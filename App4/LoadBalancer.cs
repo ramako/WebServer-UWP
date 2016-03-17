@@ -14,7 +14,6 @@ using Windows.Web.Http;
 namespace App4
 {
     //TODO Implementar health status (comrpobar si el servidor de detras esta vivo)
-    //TODO Crear "tabla hash" donde almacenar la IP origen -> servidor que le corresponde, cuando recibo conexion comprobar si existe esa ip en la tabla
     //https://msdn.microsoft.com/library/hh273122%28v=vs.100%29.aspx
     public abstract class LoadBalancer : Server
     {
@@ -47,16 +46,20 @@ namespace App4
         }
 
         //https://github.com/christophwille/winrt-vasily/blob/facd1741a7ca278ecd99e7ce9336adea408b4917/Source/Vasily/ViewModels/MainPageViewModel.cs
+
+            // Retrieve all IPS.
         public async static void getServersHealth()
         {
             string ConnectionAttemptInformation = "";
-            HostName server2 = new HostName("192.168.1.30");
+            foreach (var item in ConfigData.getIps()) {
+
+                HostName server = new HostName(item.Text);
             try
             {
                 using (var tcpClient = new StreamSocket())
                 {
                     await tcpClient.ConnectAsync(
-                        server2,
+                       server,
                         "80",
                         SocketProtectionLevel.PlainSocket);
 
@@ -80,7 +83,9 @@ namespace App4
                 }
             }
 
-            Debug.WriteLine(ConnectionAttemptInformation);
+                Debug.WriteLine(ConnectionAttemptInformation);
+            }
+
 
         }
 
@@ -91,7 +96,7 @@ namespace App4
             if (ipClientList.TryGetValue(args.Socket.Information.RemoteAddress.ToString(), out value) == true)
             {
                 serverUri = value;
-     //           Debug.WriteLine("IP found in hash table.");
+                Debug.WriteLine("IP found in hash table.");
             }
             else
             {
@@ -109,22 +114,27 @@ namespace App4
         private async void Listener_ConnectionReceived(StreamSocketListener sender, StreamSocketListenerConnectionReceivedEventArgs args)
         {
 
+      
+
             foreach (var item in ipClientList)
                 Debug.WriteLine(item);
 
             DataReader reader = new DataReader(args.Socket.InputStream);
             reader.InputStreamOptions = InputStreamOptions.Partial;
 
-            string serverUri = dealServer(args);
+           
           
             var bytesAvailable = await reader.LoadAsync(1000);
               var byteArray = new byte[bytesAvailable];
               reader.ReadBytes(byteArray);
 
-            if(getHttpMethod(byteArray)!="GET")
+            if (getHttpMethod(byteArray) != "GET")
             {
-                throw new Exception ("Metodo HTTP no soportado");
+                Debug.WriteLine("Metodo HTTP no soportado");
+                return;
             }
+
+            string serverUri = dealServer(args);
             string fileRequested = getPathToFile(byteArray);
 
             var uriRequest = new Uri(serverUri + fileRequested);

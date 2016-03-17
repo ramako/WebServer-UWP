@@ -31,10 +31,17 @@ namespace App4
             listener =  new StreamSocketListener();
             listener.ConnectionReceived += Listener_ConnectionReceived;
             ipAdresses=NetworkInformation.GetHostNames();
+       
 
         }
-        public async Task startServer(string port)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public async Task startServer()
         {
+            string port = ConfigData.getSettings("port");
+            Debug.WriteLine(port);
             rootDirectory = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFolderAsync(@"www/");
             try {
                 

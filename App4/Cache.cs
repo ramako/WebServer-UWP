@@ -51,13 +51,14 @@ namespace App4
 
         public async Task downloadImage(Uri imageRequested, string fileNameRequested)
         {
-            try { 
-            StorageFile myfile = await cache.CreateFileAsync(fileNameRequested, CreationCollisionOption.ReplaceExisting);
-            var response = await cliente.GetAsync(imageRequested);
-            var stream=await myfile.OpenAsync(FileAccessMode.ReadWrite);
-            await response.Content.WriteToStreamAsync(stream);
-            response.Dispose();
-            stream.Dispose();
+            try
+            { 
+                StorageFile myfile = await cache.CreateFileAsync(fileNameRequested, CreationCollisionOption.ReplaceExisting);
+                var response = await cliente.GetAsync(imageRequested);
+                var stream=await myfile.OpenAsync(FileAccessMode.ReadWrite);
+                await response.Content.WriteToStreamAsync(stream);
+                response.Dispose();
+                stream.Dispose();
             } catch (Exception e)
             {
                 Debug.WriteLine("Error");

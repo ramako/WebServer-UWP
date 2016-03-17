@@ -19,6 +19,7 @@ namespace App4
         protected StreamSocketListener listener;
         protected StorageFolder rootDirectory;
 
+
         protected async Task<byte[]> getHtmlFileAsBytes(string fileRequested)
         {
             Byte[] bSendData;
@@ -41,7 +42,11 @@ namespace App4
 
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="byteArray"></param>
+        /// <returns></returns>
         protected string getPathToFile(Byte[] byteArray)
         {
             const int positionOfPathRequested = 1;
@@ -50,7 +55,11 @@ namespace App4
 
             return pathRequested[positionOfPathRequested].TrimStart('/').Replace('/', '\\');
         }
-
+        /// <summary>
+        /// Method to find out which HTTP Method the client requested.
+        /// </summary>
+        /// <param name="byteArray"></param>
+        /// <returns> A string that contains the name of the HTTP method requested by the client.</returns>
         protected string getHttpMethod(Byte[] byteArray)
         {
             const int positionOfMethod = 0;

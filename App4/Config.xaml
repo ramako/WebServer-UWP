@@ -1,0 +1,22 @@
+﻿<Page
+    x:Class="App4.Config"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:App4"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Background="{ThemeResource AppBarItemForegroundThemeBrush}">
+        <StackPanel x:Name="mainConfigStackPanel">
+            <TextBlock Foreground="{ThemeResource AppBarBackgroundThemeBrush}"> Puerto a escuchar en el servidor web</TextBlock>
+            <TextBox x:Name="webServerPort"> </TextBox>
+            <TextBlock Foreground="{ThemeResource AppBarBackgroundThemeBrush}"> IPs de los servidores web a balancear por el balanceador</TextBlock>
+
+            <Button x:Name="saveConfig" Click="saveConfig_Click" Background="{ThemeResource AppBarBackgroundThemeBrush}"> Save</Button>
+            <Button x:Name="backButton" Content="Back" Click="backButton_Click" Foreground="#FFF7F7F7" Background="{ThemeResource CheckBoxDisabledBackgroundThemeBrush}"></Button>
+            <Button x:Name="addServer" Click="addServer_Click" Background="{ThemeResource AppBarBackgroundThemeBrush}">Add</Button>
+        </StackPanel>
+        
+    </Grid>
+</Page>

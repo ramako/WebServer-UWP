@@ -8,8 +8,11 @@
     mc:Ignorable="d">
 
     <Grid x:Name="mainGrid" Background="{ThemeResource AppBarItemForegroundThemeBrush}">
+        <StackPanel> 
         <Button x:Name="button" Content="Web Server" HorizontalAlignment="Left" Margin="51,327,0,0" VerticalAlignment="Top" Click="button_Click" Foreground="#FFF7F7F7" Background="{ThemeResource CheckBoxDisabledBackgroundThemeBrush}"/>
-        <Button x:Name="button2" Content="Load Balancer" HorizontalAlignment="Left" VerticalAlignment="Top" Click="button2_Click" Margin="51,359,0,0" Foreground="#FFF7F7F7" Background="{ThemeResource CheckBoxDisabledBackgroundThemeBrush}"/>
+        <Button x:Name="button2" Content="Load Balancer" HorizontalAlignment="Left" VerticalAlignment="Top" Click="button2_Click" Foreground="#FFF7F7F7" Background="{ThemeResource CheckBoxDisabledBackgroundThemeBrush}"/>
+        <Button x:Name="configButton" Content="Configuration" Click="configButton_Click" Foreground="#FFF7F7F7" Background="{ThemeResource CheckBoxDisabledBackgroundThemeBrush}" > </Button>
+        </StackPanel>
     </Grid>
 
 

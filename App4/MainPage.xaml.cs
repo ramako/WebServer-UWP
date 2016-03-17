@@ -34,7 +34,7 @@ namespace App4
             this.InitializeComponent();
             var checkServerStatusDispatcher = new DispatcherTimer();
             checkServerStatusDispatcher.Tick += CheckServerStatusDispatcher_Tick;
-            checkServerStatusDispatcher.Interval = new TimeSpan(0, 1, 0);
+            checkServerStatusDispatcher.Interval = new TimeSpan(0, 0, 5);
             checkServerStatusDispatcher.Start();
             //Iniciar automaticamente el servidor
            // button_Click(new object(), new RoutedEventArgs());
@@ -50,19 +50,23 @@ namespace App4
         private async void button_Click(object sender, RoutedEventArgs e)
         {
             var webServer = new WebServer();
-            //NEED TO CHECK FIRST IF PORT 80 IS AVAILABLE
-            await webServer.startServer("80");
+            await webServer.startServer();
         }
 
         private async void button2_Click(object sender, RoutedEventArgs e)
         {
-           var test= new MyUserControl1();
-            test.Visibility = Visibility.Visible;
-            mainGrid.Children.Add(test);
+       //    var test= new MyUserControl1();
+         //   test.Visibility = Visibility.Visible;
+           // mainGrid.Children.Add(test);
             var loadBalancer = new RoundRobinLoadBalancer();
             await loadBalancer.startLoadBalancer("80");
             isLoadBalancerClassActive = true;
 
+        }
+
+        private void configButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Frame.Navigate(typeof(Config));
         }
     }
 }
