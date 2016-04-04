@@ -15,7 +15,6 @@
 
             <Button x:Name="saveConfig" Click="saveConfig_Click" Background="{ThemeResource AppBarBackgroundThemeBrush}"> Save</Button>
             <Button x:Name="backButton" Content="Back" Click="backButton_Click" Foreground="#FFF7F7F7" Background="{ThemeResource CheckBoxDisabledBackgroundThemeBrush}"></Button>
-            <Button x:Name="addServer" Click="addServer_Click" Background="{ThemeResource AppBarBackgroundThemeBrush}">Add</Button>
         </StackPanel>
         
     </Grid>

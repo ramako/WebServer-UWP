@@ -64,14 +64,17 @@ namespace App4
         private async void Listener_ConnectionReceived(StreamSocketListener sender, StreamSocketListenerConnectionReceivedEventArgs args)
         {
 
-           DataReader reader = new DataReader(args.Socket.InputStream);
-            reader.InputStreamOptions = InputStreamOptions.Partial;
 
-            
-               var t = Task.Run(
+         
+
+            var t =  Task.Run(
                     async () =>
                     {
-                             
+
+                        Task.CurrentId.ToString();
+                        
+                        DataReader reader = new DataReader(args.Socket.InputStream);
+                        reader.InputStreamOptions = InputStreamOptions.Partial;
                         var bytesAvailable = await reader.LoadAsync(1000);
                         var byteArray = new byte[bytesAvailable];
                         reader.ReadBytes(byteArray);
@@ -80,31 +83,34 @@ namespace App4
                             throw new Exception("Metodo HTTP no soportado");
                         }
 
-                        DataWriter writer = new DataWriter(args.Socket.OutputStream);
+                    
 
                         string fileRequested = getPathToFile(byteArray);
-                        Debug.WriteLine("File requested is " + fileRequested);
 
 
                         Byte[] bSendData;
                         var fileExtension = Path.GetExtension(fileRequested);
                         if (fileExtension==".png" || fileExtension == ".jpg")
                         {
-
                             bSendData =await getBinaryFile(fileRequested);
 
+                          
                         }
                         else
                         {
                             bSendData = await getHtmlFileAsBytes(fileRequested);
                         }
-
+                        DataWriter writer = new DataWriter(args.Socket.OutputStream);
                         writer.WriteBytes(bSendData);
                         await writer.StoreAsync();
+                        
                         await writer.FlushAsync();
     
                          args.Socket.Dispose();
-                                });
+                       reader.Dispose();
+                        writer.Dispose();
+                               });
+            t.Wait();
 
         }
 

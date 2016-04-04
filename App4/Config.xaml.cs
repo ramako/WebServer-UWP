@@ -55,15 +55,6 @@ namespace App4
             this.Frame.Navigate(typeof(MainPage));
         }
 
-        private void addServer_Click(object sender, RoutedEventArgs e)
-        {
-            
-            var test = new TextBox();
-            ConfigData.addIp(test);
-            test.Foreground = new SolidColorBrush(Windows.UI.Colors.White);
-            test.Visibility = Visibility.Visible;
-            mainConfigStackPanel.Children.Add(test);
-            Debug.WriteLine(ConfigData.getIps()[0].Text);
-        }
+ 
     }
 }

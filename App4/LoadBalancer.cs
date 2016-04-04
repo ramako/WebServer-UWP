@@ -10,6 +10,7 @@ using Windows.Networking.Sockets;
 using Windows.Storage.Streams;
 using Windows.UI.Popups;
 using Windows.Web.Http;
+using Windows.Web.Http.Filters;
 
 namespace App4
 {
@@ -21,12 +22,17 @@ namespace App4
         Cache cacheServer;
         HttpClient cliente;
       static  Dictionary<String, String> ipClientList;
+       
 
         public LoadBalancer()
         {
             ipClientList = new Dictionary<string, string>();
             listener = new StreamSocketListener();
             listener.ConnectionReceived += Listener_ConnectionReceived;
+       //     HttpBaseProtocolFilter RootFilter = new HttpBaseProtocolFilter();
+         //   RootFilter.CacheControl.ReadBehavior = Windows.Web.Http.Filters.HttpCacheReadBehavior.MostRecent;
+           // RootFilter.CacheControl.WriteBehavior = Windows.Web.Http.Filters.HttpCacheWriteBehavior.NoCache;
+
             cliente = new HttpClient();
             cacheServer = new Cache();
         }
@@ -113,8 +119,6 @@ namespace App4
         //TODO WinRT information: A connection with the server could not be established
         private async void Listener_ConnectionReceived(StreamSocketListener sender, StreamSocketListenerConnectionReceivedEventArgs args)
         {
-
-      
 
             foreach (var item in ipClientList)
                 Debug.WriteLine(item);

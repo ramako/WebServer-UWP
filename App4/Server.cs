@@ -26,7 +26,6 @@ namespace App4
             try
             {
                 string response = await getFileFormattedHtml(fileRequested);
-                Debug.WriteLine("after getfileformattedhtml");
                 bSendData = Encoding.UTF8.GetBytes(response);
             }
             catch (Exception e)
@@ -89,8 +88,11 @@ namespace App4
             var fileBinaryRequested = await rootDirectory.GetFileAsync(fileRequested);
 
             IBuffer binaryFileStream = await FileIO.ReadBufferAsync(fileBinaryRequested);
-            Byte[] bytes = System.Runtime.InteropServices.WindowsRuntime.WindowsRuntimeBufferExtensions.ToArray(binaryFileStream);
-            return bytes;
+
+            fileBinaryRequested = null;
+       //    return System.Runtime.InteropServices.WindowsRuntime.WindowsRuntimeBufferExtensions.ToArray(await FileIO.ReadBufferAsync(fileBinaryRequested));
+           return System.Runtime.InteropServices.WindowsRuntime.WindowsRuntimeBufferExtensions.ToArray(binaryFileStream);
+
         }
 
 

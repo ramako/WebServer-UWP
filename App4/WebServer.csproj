@@ -99,9 +99,14 @@
     </Content>
     <Content Include="www\404.html" />
     <Content Include="www\dog.png" />
+    <Content Include="www\eastcoast.jpg" />
+    <Content Include="www\nasa.png" />
     <Content Include="www\primerNivel\test.html" />
     <Content Include="www\prueba2.html" />
+    <Content Include="www\salzbdurg.jpg" />
+    <Content Include="www\salzburg.jpg" />
     <Content Include="www\test.html" />
+    <Content Include="www\world.png" />
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>

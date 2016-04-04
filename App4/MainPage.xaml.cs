@@ -68,5 +68,25 @@ namespace App4
         {
             this.Frame.Navigate(typeof(Config));
         }
+
+        private void addServer_Click(object sender, RoutedEventArgs e)
+        {
+
+            var backendServersIps = new TextBox();
+            ConfigData.addIp(backendServersIps);
+            backendServersIps.Foreground = new SolidColorBrush(Windows.UI.Colors.White);
+            backendServersIps.Visibility = Visibility.Visible;
+            mainConfigStackPanel.Children.Add(backendServersIps);
+            Debug.WriteLine(ConfigData.getIps()[0].Text);
+        }
+
+
+        private void saveConfig_Click(object sender, RoutedEventArgs e)
+        {
+            ConfigData.saveSettings("port", webServerPort.Text);
+
+
+        }
+
     }
 }
